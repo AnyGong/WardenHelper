@@ -1,0 +1,18 @@
+build/
+*.app
+.DS_Store
+__MACOSX/
+*.zip
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.temp

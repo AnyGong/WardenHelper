@@ -4,7 +4,7 @@ A macOS menu-bar network monitor: live speed, public IP and country, VPN state w
 
 `140 GB · 剩 25 天 │ ↑ 2.1 KB/s ↓ 3.1 KB/s │ 🛡 香港`
 
-- Requires **macOS 13+** and Xcode Command Line Tools (to build).
+- Requires **macOS 27+ on Apple silicon (Mac mini M4)** and Xcode Command Line Tools (to build).
 - Native Swift / AppKit, no third-party dependencies, no Xcode project (`make` only).
 - UI language: **Simplified Chinese** (all text in `Sources/Strings.swift`).
 - Runs as an ad-hoc signed menu-bar agent (no Dock icon). No paid Apple Developer account is needed.
@@ -26,7 +26,7 @@ A macOS menu-bar network monitor: live speed, public IP and country, VPN state w
 
 ```bash
 make run        # build for this Mac and launch
-make install    # universal build -> /Applications
+make install    # build -> /Applications
 ```
 
 1. Launch WardenHelper. A menu-bar item appears; click it for the dropdown, or press ⌘, for Settings.
@@ -34,14 +34,13 @@ make install    # universal build -> /Applications
 3. **VPN traffic (optional):** enable the Clash API in your proxy kernel, then check 设置 › 流量 › 统计设置 (default controller `127.0.0.1:9090`).
 4. **Blocking (optional):** write a rules file, set its path in 设置 › VPN 与网络 › 断开屏蔽, and install the helper from the same page (one administrator prompt).
 
-See the [User Guide](docs/USER_GUIDE.md) for the full walkthrough.
+See the [User Guide](USER_GUIDE.md) for the full walkthrough.
 
 ## Build targets
 
 | Command | Result |
 | --- | --- |
 | `make` / `make run` | Build for this Mac (and launch) |
-| `make universal` | arm64 + x86_64 |
 | `make install` / `make uninstall` | Install to / remove from `/Applications` |
 | `make release` | `build/WardenHelper-<version>.zip` + SHA-256 |
 | `make zip` | Source zip to `~/Downloads` |
@@ -56,7 +55,7 @@ Sources/     the app (every .swift file is compiled in)
 Helper/      the root helper for blocking
 Resources/   Info.plist, AppIcon.icns (light), AppIconDark.icns
 tools/       traffic_log_report.py
-docs/        detailed documentation
+*.md         detailed documentation (USER_GUIDE, BLOCKING, ...)
 Makefile
 ```
 
@@ -64,19 +63,19 @@ Makefile
 
 | Document | For | Contents |
 | --- | --- | --- |
-| [User Guide](docs/USER_GUIDE.md) | Users | Menu bar, dropdown, every Settings page, notifications, export / import |
-| [Subscriptions](docs/SUBSCRIPTIONS.md) | Users | Adding links, how values are read, schedule, matching rules |
-| [VPN Traffic](docs/VPN_TRAFFIC.md) | Users, developers | Controller setup, counting rules, node reports, traffic log and report tool |
-| [Blocking](docs/BLOCKING.md) | Users, developers | Rules file format, when it blocks, the helper, testing, limits |
-| [Data and Logs](docs/DATA_AND_LOGS.md) | Users, developers | Every file, default and Keychain item WardenHelper creates; log formats |
-| [Security and Privacy](docs/SECURITY.md) | Users, reviewers | Privilege model, network requests, secrets, hardening notes |
-| [Troubleshooting](docs/TROUBLESHOOTING.md) | Users | Symptoms, causes, fixes, how to uninstall completely |
+| [User Guide](USER_GUIDE.md) | Users | Menu bar, dropdown, every Settings page, notifications, export / import |
+| [Subscriptions](SUBSCRIPTIONS.md) | Users | Adding links, how values are read, schedule, matching rules |
+| [VPN Traffic](VPN_TRAFFIC.md) | Users, developers | Controller setup, counting rules, node reports, traffic log and report tool |
+| [Blocking](BLOCKING.md) | Users, developers | Rules file format, when it blocks, the helper, testing, limits |
+| [Data and Logs](DATA_AND_LOGS.md) | Users, developers | Every file, default and Keychain item WardenHelper creates; log formats |
+| [Security and Privacy](SECURITY.md) | Users, reviewers | Privilege model, network requests, secrets, hardening notes |
+| [Troubleshooting](TROUBLESHOOTING.md) | Users | Symptoms, causes, fixes, how to uninstall completely |
 | [Developer Guide](DEVELOPER_GUID.md) | Contributors | Architecture, modules, flows, workflow, rules, recipes |
 
 ## Privacy and security in brief
 
 - WardenHelper itself never runs as root; only the optional helper does, and it re-validates every rule it receives.
-- Public IP and AI checks contact third-party services (listed in [Security and Privacy](docs/SECURITY.md#network-requests)).
+- Public IP and AI checks contact third-party services (listed in [Security and Privacy](SECURITY.md#network-requests)).
 - Subscription links carry access tokens: exported backups contain them, so keep the file private.
 - The controller secret defaults to a constant in the source. **Change it and do not publish the source unchanged.**
 

@@ -21,9 +21,8 @@ import Foundation
 enum SubLogLevel: String, Sendable { case debug, note, success, warning, error }
 typealias SubLogger = @Sendable (SubLogLevel, String) -> Void
 
-let defaultSubLogger: SubLogger = { level, message in
-    print("[\(level.rawValue.uppercased())] \(message)")
-}
+/// Default sink is silent: this is a GUI agent with no console; callers that want logs pass their own.
+let defaultSubLogger: SubLogger = { _, _ in }
 
 enum SubscriptionError: Error, CustomStringConvertible {
     case config(String)
@@ -1453,29 +1452,3 @@ enum SubscriptionService {
         return SubscriptionRefreshResult(entries: active, fetchSummary: summary, analysis: analysis, alerts: alerts)
     }
 }
-
-// MARK: - Optional CLI (compile with -D SUBSCRIPTION_TOOL_MAIN)
-
-#if SUBSCRIPTION_TOOL_MAIN
-@main
-struct SubscriptionTool {
-    static func main() async {
-        let args = CommandLine.arguments
-        let config = URL(fileURLWithPath: args.count > 1 ? args[1] : "config/subscriptions.json")
-        let dir = URL(fileURLWithPath: args.count > 2 ? args[2] : "generated/subscriptions", isDirectory: true)
-        do {
-            let r = try await SubscriptionService.refresh(configURL: config, subsDir: dir)
-            for plan in r.analysis.plans {
-                let traffic = plan.remainingTrafficGB.map { String(format: "%.2f GB", $0) } ?? "-"
-                print("[\(plan.subscriptionName)] nodes=\(r.analysis.proxies[plan.subscriptionName]?.count ?? 0)"
-                      + " traffic=\(traffic) expire=\(plan.expireDateString ?? "-") daysLeft=\(plan.daysLeft.map(String.init) ?? "-")")
-            }
-            for alert in r.alerts { print(alert.message) }
-            exit(r.fetchSummary.values.contains(.failed) ? 1 : 0)
-        } catch {
-            print("error: \(error)")
-            exit(1)
-        }
-    }
-}
-#endif

@@ -1,6 +1,6 @@
 # WardenHelper Developer Guide
 
-For anyone changing WardenHelper's code. Users should start with [README.md](README.md) and [docs/USER_GUIDE.md](docs/USER_GUIDE.md).
+For anyone changing WardenHelper's code. Users should start with [README.md](README.md) and [docs/USER_GUIDE.md](USER_GUIDE.md).
 
 Version described: app `1.0.0` (build 13), helper protocol `BlockIPC.helperVersion = 9`.
 
@@ -27,7 +27,7 @@ WardenHelper is a macOS menu-bar agent (`LSUIElement`, no Dock icon) that shows 
 | --- | --- |
 | Language | Swift, AppKit (no SwiftUI, no storyboards/xibs) |
 | Build system | `make` + `swiftc` (no Xcode project, no SwiftPM) |
-| Minimum macOS | 13.0 (`MIN_MACOS` in Makefile, `LSMinimumSystemVersion` in Info.plist) |
+| Target | macOS 27+, arm64 only (Mac mini M4); minimum macOS 27.0 (`MIN_MACOS` in Makefile, `LSMinimumSystemVersion` in Info.plist) |
 | Third-party dependencies | None. Logos embedded from Lobe Icons (MIT) |
 | Signing | Ad-hoc (`codesign --sign -`); no Apple Developer account, so no NetworkExtension / SMAppService privileged helper |
 | UI language | Simplified Chinese only; every string lives in `Sources/Strings.swift` (`L10n`) |
@@ -50,7 +50,7 @@ WardenHelper/
 ├── Makefile                  build, run, install, release, zip
 ├── README.md                 user-facing overview
 ├── DEVELOPER_GUID.md         this file
-├── docs/                     user guide, blocking, traffic, subscriptions, data, security, troubleshooting
+├── *.md                      user guide, blocking, traffic, subscriptions, data, security, troubleshooting
 ├── Resources/
 │   ├── Info.plist            bundle id com.warden-helper.app, version, ATS exception for ip-api.com
 │   ├── AppIcon.icns          light icon (bundle default: Finder, notifications)
@@ -276,7 +276,7 @@ Setter in `Preferences` → `notify()` → `AppDelegate.preferencesChanged` re-r
 
 ### 6.1 Environment
 
-- macOS 13+, Xcode Command Line Tools (`xcode-select --install`). No Xcode project is needed.
+- macOS 27+ on Apple silicon, Xcode Command Line Tools (`xcode-select --install`). No Xcode project is needed.
 - Optional: Python 3 for `tools/traffic_log_report.py`.
 - A proxy kernel with the Clash API enabled (sing-box `clash_api` or mihomo) to exercise traffic counting.
 
@@ -307,7 +307,7 @@ Always test the uninstall path too (`warden-helper-daemon --restore` must put DN
 3. If it adds a setting, follow 8.1; if it adds a menu block, follow 8.2.
 4. `make run`; exercise light and dark mode, VPN on / off / system-proxy, and wake/unlock where relevant.
 5. If it touches counting, compare the traffic log `missed` values (see 9.1).
-6. If it touches the helper, bump the version and run the manual checks in [docs/BLOCKING.md](docs/BLOCKING.md#testing-vpn-off).
+6. If it touches the helper, bump the version and run the manual checks in [docs/BLOCKING.md](BLOCKING.md#testing-vpn-off).
 7. Update README / docs in the same change.
 
 ### 6.5 Versioning
@@ -364,7 +364,7 @@ Add one `Tab(id:group:title:heading:…)` entry (with its sidebar symbol) to the
 
 1. Add a case to `BlockRuleKind` and validation to `BlockRuleValidator` in `BlockProtocol.swift`.
 2. Enforce it in the helper (`Enforcer` and the component that applies it).
-3. Document it in [docs/BLOCKING.md](docs/BLOCKING.md); bump `helperVersion`.
+3. Document it in [docs/BLOCKING.md](BLOCKING.md); bump `helperVersion`.
 
 ### 8.5 Add an AI vendor
 
@@ -414,9 +414,8 @@ See each docs page; the main ones: about 1 s between tunnel loss and arming, DoH
 
 | Command | Result |
 | --- | --- |
-| `make` | Native build to `build/WardenHelper.app` |
-| `make universal` | arm64 + x86_64 slices merged with `lipo` |
-| `make install` | Universal build copied to `/Applications` |
+| `make` | arm64 build to `build/WardenHelper.app` |
+| `make install` | Build copied to `/Applications` |
 | `make release` | `build/WardenHelper-<version>.zip` (ditto, quarantine attributes cleared) + SHA-256 for a Homebrew cask |
 | `make zip` | Source zip of `Helper tools Makefile README.md Resources Sources` to `~/Downloads` |
 | `make uninstall` | Quit the app, remove `/Applications/WardenHelper.app` (the helper is removed from Settings, which runs `--restore`) |
